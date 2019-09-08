@@ -1,11 +1,12 @@
 # Road Runner Router
 
-![travis](https://img.shields.io/travis/parisholley/road-runner)
-![dependencies](https://img.shields.io/librariesio/github/parisholley/road-runner)
-![version](https://img.shields.io/npm/v/@parisholley/road-runner)
-![coverage](https://img.shields.io/coveralls/github/parisholley/road-runner)
+[![travis](https://img.shields.io/travis/parisholley/road-runner)][travis]
+![dependencies](https://img.shields.io/depfu/parisholley/road-runner)
+[![version](https://img.shields.io/npm/v/@parisholley/road-runner)][npm]
+[![coverage](https://img.shields.io/coveralls/github/parisholley/road-runner)][coveralls]
 ![size](https://img.shields.io/bundlephobia/min/@parisholley/road-runner)
 ![supported](https://img.shields.io/node/v/@parisholley/road-runner)
+
 
 A router for when latency is Wile E. Coyote :)
 
@@ -106,3 +107,7 @@ function doLookup(headers:Record<string,string>){
   handler();
 }
 ````
+
+[travis]: https://travis-ci.org/parisholley/road-runner
+[npm]: https://www.npmjs.com/package/@parisholley/road-runner
+[coveralls]: https://coveralls.io/github/parisholley/road-runner
