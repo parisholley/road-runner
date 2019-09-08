@@ -74,6 +74,19 @@ describe('standard type checking', () => {
     }
   });
 
+  test('Should not be able to overlap wildcard with params', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/*', true);
+      router.addRoute('GET', '/:param1', true);
+
+      throw new Error('Should have thrown error.');
+    } catch (e) {
+      expect(e.message).toEqual('Route already defined.');
+    }
+  });
+
   test('Root route not already defined for different bucket.', () => {
     const router = roadrunner();
     router.addRoute('GET', '/foo', true);

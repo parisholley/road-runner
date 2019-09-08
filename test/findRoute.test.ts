@@ -204,6 +204,24 @@ describe('params', () => {
     });
   });
 
+  test('Should allow different param keys along same path', () => {
+    const router = roadrunner({allowChangingParameterName: true});
+
+    const value = generate();
+    router.addRoute('GET', '/foo/:param1/baz/:param2/buh', value);
+    router.addRoute('GET', '/foo/:param3/baz/:param4/boy', value);
+
+    expect(router.findRoute('GET', '/foo/bar/baz/bum/buh')).toEqual({
+      params: {param1: 'bar', param2: 'bum'},
+      value
+    });
+
+    expect(router.findRoute('GET', '/foo/bar/baz/bum/boy')).toEqual({
+      params: {param3: 'bar', param4: 'bum'},
+      value
+    });
+  });
+
   test('Should not find multiple param path if last wildcard is missing value', () => {
     const router = roadrunner();
 
@@ -456,4 +474,63 @@ describe('mixed', () => {
       value
     });
   });
+});
+
+test('should allow dynamic to overlap static', () => {
+  const router = roadrunner();
+
+  router.addRoute('GET', '/foo', 1);
+  router.addRoute('GET', '/:param', 2);
+
+  expect(router.findRoute('GET', '/foo')).toEqual({
+    params: {},
+    value: 1
+  });
+
+  expect(router.findRoute('GET', '/value')).toEqual({
+    params: {param: 'value'},
+    value: 2
+  });
+});
+
+test('should allow static to overlap dynamic', () => {
+  const router = roadrunner();
+
+  router.addRoute('GET', '/:param', 1);
+  router.addRoute('GET', '/foo', 2);
+
+  expect(router.findRoute('GET', '/foo')).toEqual({
+    params: {},
+    value: 2
+  });
+
+  expect(router.findRoute('GET', '/value')).toEqual({
+    params: {param: 'value'},
+    value: 1
+  });
+});
+
+test('kitchen sink', () => {
+  const routes = [
+    {path: '/', test: '/'},
+    {path: '/:param1', params: {param1: 'foo'}, test: '/foo'},
+    {path: '/foo/bar', test: '/foo/bar'},
+    {path: '/foo/:param1', params: {param1: 'value'}, test: '/foo/value'},
+    {path: '/foo/:param1/baz/*', params: {param1: 'value'}, test: '/foo/value/baz/bah'}
+  ];
+
+  const router = roadrunner();
+
+  for (const {path} of routes) {
+    router.addRoute('GET', path, path);
+  }
+
+  for (const {params = {}, path, test} of routes) {
+    const result = router.findRoute('GET', test);
+
+    expect(result).toEqual({
+      value: path,
+      params
+    })
+  }
 });
