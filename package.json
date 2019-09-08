@@ -5,6 +5,10 @@
     "email": "mail@parisholley.com",
     "url": "https://www.parisholley.com"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/parisholley/road-runner.git"
+  },
   "description": "The fastest path resolver for HTTP routing on modern Node.JS",
   "devDependencies": {
     "@types/jest": "^24.0.18",
