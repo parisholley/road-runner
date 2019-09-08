@@ -1,3 +1,8 @@
+export interface Options {
+  ignoreTrailingSlash?: boolean;
+  allowChangingParameterName?: boolean;
+}
+
 export interface Router<V> {
   addRoute(bucket: string, path: string, value: V): void;
 
@@ -7,12 +12,6 @@ export interface Router<V> {
 export interface Result<V> {
   value: V;
   params: Record<string, string>;
-}
-
-
-export interface Options {
-  ignoreTrailingSlash?: boolean;
-  allowChangingParameterName?: boolean;
 }
 
 function typeCheck(bucket: string, path: string) {
@@ -47,19 +46,15 @@ export default function roadrunner<V>({ignoreTrailingSlash, allowChangingParamet
   const dynamic: Record<string, any> = {};
   const nonDynamic: Record<string, any> = {};
 
-  let cleanPath = (path: string) => path;
+  const cleanPath = (path: string) => {
+    let real = path;
 
-  if (ignoreTrailingSlash) {
-    cleanPath = (path: string) => {
-      let real = path;
-
-      if (real[real.length - 1] === '/') {
-        return real.substring(0, real.length - 1);
-      }
-
-      return real;
+    if (ignoreTrailingSlash && real[real.length - 1] === '/') {
+      return real.substring(0, real.length - 1);
     }
-  }
+
+    return real;
+  };
 
   const findRoute = (bucket: string, path: string): Result<V> | null => {
     typeCheck(bucket, path);
@@ -86,52 +81,42 @@ export default function roadrunner<V>({ignoreTrailingSlash, allowChangingParamet
       const chunk = split[i];
 
       if (chunk === '') {
-        break;
+        return null;
       }
 
       const isLeaf = i == split.length - 1;
 
       let lookup = branch[chunk];
 
-      if (!lookup || (isLeaf && lookup._routes)) {
+      if (!lookup || (isLeaf && !lookup.value)) {
         lookup = branch['*'];
       }
 
-      if (lookup) {
-        branch = lookup;
+      if (!lookup) {
+        return null;
+      }
 
-        const param = (branch._routes && branch._routes.param) || branch.param;
+      branch = lookup;
 
-        if (param) {
-          if (allowChangingParameterName) {
-            paramChunks.push(chunk);
-          } else {
-            params[param] = chunk;
+      if (branch.param) {
+        if (allowChangingParameterName) {
+          paramChunks.push(chunk);
+        } else {
+          params[branch.param] = chunk;
+        }
+      }
+
+      if (isLeaf) {
+        if (allowChangingParameterName) {
+          for (const index in paramChunks) {
+            params[branch.params[index]] = paramChunks[index];
           }
         }
 
-        if (isLeaf) {
-          if (branch._routes) {
-            branch = branch[''];
-          }
-
-          if (branch === undefined) {
-            return null;
-          }
-
-          if (allowChangingParameterName && branch.params) {
-            for (const index in paramChunks) {
-              params[branch.params[index]] = paramChunks[index];
-            }
-          }
-
-          return {
-            value: branch.value,
-            params
-          }
+        return {
+          value: branch.value,
+          params
         }
-      } else {
-        break;
       }
     }
 
@@ -179,7 +164,7 @@ export default function roadrunner<V>({ignoreTrailingSlash, allowChangingParamet
 
       for (let i = 0; i < split.length; i++) {
         const isParam = split[i].indexOf(':') === 0;
-        let chunk = isParam ? '*' : split[i];
+        const chunk = isParam ? '*' : split[i];
 
         if (chunk.includes('*') && chunk !== '*') {
           throw new Error('Wildcard must be by itself in path.');
@@ -189,32 +174,25 @@ export default function roadrunner<V>({ignoreTrailingSlash, allowChangingParamet
           throw new Error('Param must be by itself in path.');
         }
 
-        const paramChunk = split[i].substring(1);
+        let paramChunk: null | string = null;
 
         if (isParam) {
+          paramChunk = split[i].substring(1);
           params.push(paramChunk);
         }
 
-        const leafValue = {params, value};
-
         if (i === split.length - 1) {
-          parent[chunk] = isParam ? {param: paramChunk, ...leafValue} : leafValue;
-        } else if (!parent[chunk]) {
-          const child = {_routes: isParam ? {param: paramChunk} : {path: split[i], ...leafValue}};
-          parent[chunk] = child;
-
-          parent = child;
+          parent[chunk] = {value, param: paramChunk, params};
         } else {
           const existing = parent[chunk];
 
-          if (existing.param || !existing._routes) {
-            const child = {_routes: isParam ? {param: paramChunk} : split[i], '': existing};
-
+          if (existing) {
+            parent = existing;
+          } else {
+            const child = {param: paramChunk};
             parent[chunk] = child;
 
             parent = child;
-          } else if (existing._routes) {
-            parent = existing;
           }
         }
 

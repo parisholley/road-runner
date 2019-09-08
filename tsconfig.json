@@ -6,14 +6,14 @@
     "strict": true,
     "module": "commonjs",
     "outDir": "dist",
+    "baseUrl": "src",
     "target": "es6",
     "lib": [
       "es6"
     ]
   },
   "include": [
-    "index.ts",
-    "test/*.ts"
+    "src/*.ts"
   ],
   "exclude": [
     "node_modules",

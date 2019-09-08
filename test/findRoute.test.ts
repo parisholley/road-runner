@@ -1,4 +1,4 @@
-import roadrunner from '../index';
+import roadrunner from '../src/index';
 
 const generate = () => ({
   foo: Math.random() * 10000000000

@@ -19,12 +19,14 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "source": "src/router.ts",
   "scripts": {
-    "build": "tsc",
-    "preversion": "rm -rf dist && tsc",
+    "build": "rm -rf dist && tsc",
+    "preversion": "npm run build & npm run test",
     "publish": "git push --tags",
     "test": "jest",
-    "test-coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+    "test-coverage": "rm -rf coverage && jest --coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "engines": {
     "node": ">=6"
