@@ -2,7 +2,7 @@
 
 ![travis](https://travis-ci.org/parisholley/road-runner.svg?branch=master)
 
-A router for when latency is Wile. E. Coyote :)
+A router for when latency is Wile E. Coyote :)
 
 ## Why is it fast?
 
