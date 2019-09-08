@@ -1,0 +1,23 @@
+{
+  "name": "@parisholley/road-runner",
+  "author": {
+    "name": "Paris Holley",
+    "email": "mail@parisholley.com",
+    "url": "https://www.parisholley.com"
+  },
+  "description": "The fastest path resolver for HTTP routing on modern Node.JS",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.4",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.6.2"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc index.ts",
+    "test": "jest"
+  }
+}

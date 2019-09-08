@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "incremental": true,
+    "declaration": true,
+    "strict": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": [
+      "es6"
+    ]
+  },
+  "include": [
+    "index.ts",
+    "test/*.ts",
+    "test.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
