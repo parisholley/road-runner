@@ -5,6 +5,7 @@
 ![version](https://img.shields.io/npm/v/@parisholley/road-runner)
 ![coverage](https://img.shields.io/coveralls/github/parisholley/road-runner)
 ![size](https://img.shields.io/bundlephobia/min/@parisholley/road-runner)
+![supported](https://img.shields.io/node/v/@parisholley/road-runner)
 
 A router for when latency is Wile E. Coyote :)
 
