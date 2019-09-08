@@ -6,7 +6,7 @@ export interface Router<V> {
 
 export interface Result<V> {
   value: V;
-  params?: Record<string, string>;
+  params: Record<string, string>;
 }
 
 function typeCheck(bucket: string, path: string) {
