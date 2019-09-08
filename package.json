@@ -21,5 +21,6 @@
     "build": "tsc",
     "publish": "git push --tags && npm publish",
     "test": "jest"
-  }
+  },
+  "version": "1.0.0"
 }
