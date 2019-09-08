@@ -1,6 +1,10 @@
 # Road Runner Router
 
-![travis](https://travis-ci.org/parisholley/road-runner.svg?branch=master)
+![travis](https://img.shields.io/travis/parisholley/road-runner)
+![dependencies](https://img.shields.io/librariesio/github/parisholley/road-runner)
+![version](https://img.shields.io/npm/v/@parisholley/road-runner)
+![coverage](https://img.shields.io/coveralls/github/parisholley/road-runner)
+![size](https://img.shields.io/bundlephobia/min/@parisholley/road-runner)
 
 A router for when latency is Wile E. Coyote :)
 

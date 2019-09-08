@@ -21,7 +21,7 @@
     "build": "tsc",
     "preversion": "rm -rf dist && tsc",
     "publish": "git push --tags",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "version": "1.0.6"
 }
