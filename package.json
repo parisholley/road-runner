@@ -19,7 +19,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "publish": "git push --tags && npm publish",
+    "publish": "git push --tags && npm publish --access public",
     "test": "jest"
   },
   "version": "1.0.0"
