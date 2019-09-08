@@ -36,7 +36,7 @@ up to you to tie into your favorite HTTP library and execute the handler
 code and return a response (if any):
 
 ```typescript
-import roadrunner from "@parisholley/road-runner";
+import {roadrunner} from "@parisholley/road-runner";
 
 const router = roadrunner();
 
@@ -56,7 +56,7 @@ When enabled you can access the same path regardless of a trailing slash
 existing in the lookup path.
 
 ```typescript
-import roadrunner from "@parisholley/road-runner";
+import {roadrunner} from "@parisholley/road-runner";
 
 const router = roadrunner();
 
@@ -72,7 +72,7 @@ When enabled you can have multiple nested paths change parameter names,
 otherwise it will exception when trying to overlap.
 
 ```typescript
-import roadrunner from "@parisholley/road-runner";
+import {roadrunner} from "@parisholley/road-runner";
 
 const router = roadrunner();
 
@@ -109,7 +109,7 @@ you would like. In the case of switching behavior based on an API
 version provided in the header, you could do something like this:
 
 ```typescript
-import roadrunner from "@parisholley/road-runner";
+import {roadrunner} from "@parisholley/road-runner";
 
 const router = roadrunner();
 

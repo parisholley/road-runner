@@ -5,6 +5,7 @@ jest.config.js
 .travis.yml
 .gitignore
 test
+tsconfig.tsbuildinfo
 node_modules
 dist/tsconfig.tsbuildinfo
 dist/test

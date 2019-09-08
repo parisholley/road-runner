@@ -42,7 +42,7 @@ function splitPath(bucket: string, path: string) {
   return split;
 }
 
-export default function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}: Options = {}): Router<V> {
+export function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}: Options = {}): Router<V> {
   const dynamic: Record<string, any> = {};
   const nonDynamic: Record<string, any> = {};
 

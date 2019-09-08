@@ -26,11 +26,11 @@
     "typescript": "^3.6.2"
   },
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "source": "src/router.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "source": "index.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "tsc",
     "preversion": "npm run build & npm run test",
     "publish": "git push --tags",
     "test": "jest",
