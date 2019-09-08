@@ -3,7 +3,6 @@ script:
   - npm run build
   - npm run test-coverage
 node_js:
-  - 4
   - 6
   - 8
   - 10
