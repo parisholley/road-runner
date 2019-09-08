@@ -6,7 +6,6 @@
     "url": "https://www.parisholley.com"
   },
   "description": "The fastest path resolver for HTTP routing on modern Node.JS",
-  "version": "1.0.0",
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
