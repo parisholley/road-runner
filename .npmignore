@@ -1,0 +1,9 @@
+tsconfig.json
+README.md
+jest.config.js
+.travis.yml
+.gitignore
+test
+node_modules
+dist/tsconfig.tsbuildinfo
+dist/test

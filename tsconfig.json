@@ -5,17 +5,18 @@
     "declaration": true,
     "strict": true,
     "module": "commonjs",
-    "moduleResolution": "node",
+    "outDir": "dist",
+    "target": "es6",
     "lib": [
       "es6"
     ]
   },
   "include": [
     "index.ts",
-    "test/*.ts",
-    "test.ts"
+    "test/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }
