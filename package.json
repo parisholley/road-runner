@@ -25,5 +25,8 @@
     "test": "jest",
     "test-coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
+  "engines": {
+    "node": ">=6"
+  },
   "version": "1.0.6"
 }
