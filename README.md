@@ -66,6 +66,20 @@ router.lookupRoute('GET', '/path');
 router.lookupRoute('GET', '/path/');
 ```
 
+### `allowChangingParameterName` (boolean, default = false)
+
+When enabled you can have multiple nested paths change parameter names,
+otherwise it will exception when trying to overlap.
+
+```typescript
+import roadrunner from "@parisholley/road-runner";
+
+const router = roadrunner();
+
+router.addRoute('GET', '/:param1/foo', () => {});
+router.addRoute('GET', '/:param2/bar', () => {});
+```
+
 ## Supported Path Syntax
 
 * /foo
