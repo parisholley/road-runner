@@ -5,7 +5,7 @@ export interface Router<V> {
 }
 
 export interface Result<V> {
-  value: V | undefined;
+  value: V;
   params?: Record<string, string>;
 }
 
