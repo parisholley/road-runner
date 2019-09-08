@@ -6,10 +6,15 @@
     "url": "https://www.parisholley.com"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/parisholley/road-runner.git"
+    "type": "git",
+    "url": "https://github.com/parisholley/road-runner.git"
   },
-  "description": "The fastest path resolver for HTTP routing on modern Node.JS",
+  "homepage": "https://github.com/parisholley/road-runner",
+  "keywords": [
+    "router",
+    "resolver"
+  ],
+  "description": "The fastest path resolver for URL routing on modern Node.JS",
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
