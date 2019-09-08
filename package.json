@@ -9,6 +9,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
+    "coveralls": "^3.0.6",
     "jest": "^24.9.0",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
@@ -21,7 +22,8 @@
     "build": "tsc",
     "preversion": "rm -rf dist && tsc",
     "publish": "git push --tags",
-    "test": "jest --coverage"
+    "test": "jest",
+    "test-coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "version": "1.0.6"
 }
