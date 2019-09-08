@@ -19,6 +19,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "rm -rf dist && tsc",
     "publish": "git push --tags",
     "test": "jest"
   },
