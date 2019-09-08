@@ -1,10 +1,10 @@
-interface Router<V> {
+export interface Router<V> {
   addRoute(bucket: string, path: string, value: V): void;
 
   findRoute(bucket: string, path: string): Result<V> | null;
 }
 
-interface Result<V> {
+export interface Result<V> {
   value: V | undefined;
   params?: Record<string, string>;
 }
@@ -41,7 +41,7 @@ function splitPath(bucket: string, path: string) {
   return split;
 }
 
-function roadrunner<V>({ignoreTrailingSlash}: { ignoreTrailingSlash?: boolean } = {}): Router<V> {
+export default function roadrunner<V>({ignoreTrailingSlash}: { ignoreTrailingSlash?: boolean } = {}): Router<V> {
   const dynamic: Record<string, any> = {};
   const nonDynamic: Record<string, any> = {};
 
@@ -200,5 +200,3 @@ function roadrunner<V>({ignoreTrailingSlash}: { ignoreTrailingSlash?: boolean } 
     findRoute
   };
 }
-
-export = roadrunner;

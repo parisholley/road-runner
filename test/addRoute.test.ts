@@ -1,4 +1,4 @@
-import roadrunner = require("../index");
+import roadrunner from '../index';
 
 describe('standard type checking', () => {
   test('Bucket should be a string', () => {
