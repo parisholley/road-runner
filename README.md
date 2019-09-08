@@ -12,6 +12,8 @@ A router for when latency is Wile E. Coyote :)
 
 ## Why is it fast?
 
+[See Benchmarks](https://github.com/parisholley/router-benchmark)
+
 * Params are detected and provided as objects, but no regex or value casting, strings only
 * Case sensitive (use .toLowerCase() when inserting/retrieving if you want case-insensitivity)
 * Limited validation (assuming you are going to pass in valid paths and HTTP methods)
