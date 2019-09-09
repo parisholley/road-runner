@@ -1,6 +1,7 @@
+import {createNode, Node} from "./node";
+
 export interface Options {
   ignoreTrailingSlash?: boolean;
-  allowChangingParameterName?: boolean;
 }
 
 export interface Router<V> {
@@ -36,15 +37,27 @@ function typeCheck(bucket: string, path: string) {
 function splitPath(bucket: string, path: string) {
   const split = path.split('/');
 
-  // because string always starts with "/", [0] will always be an empty space
-  split[0] = bucket;
+  // because string always starts with "/", so stick bucket in first segment
+  split.shift();
+  split[0] = `${split[0]}${bucket}`;
 
   return split;
 }
 
-export function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}: Options = {}): Router<V> {
-  const dynamic: Record<string, any> = {};
-  const nonDynamic: Record<string, any> = {};
+function countParams(path: string) {
+  let n = 0;
+  for (let i = 0; i < path.length; i++) {
+    if (path[i] !== ":" && path[i] !== "*") {
+      continue;
+    }
+    n++;
+  }
+
+  return n;
+}
+
+export function roadrunner<V>({ignoreTrailingSlash}: Options = {}): Router<V> {
+  const buckets: Record<string, Node<V>> = {};
 
   const cleanPath = (path: string) => {
     let real = path;
@@ -61,67 +74,25 @@ export function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}:
 
     const realPath = cleanPath(path);
 
-    let result = nonDynamic[bucket] && nonDynamic[bucket][realPath];
+    let result = buckets[bucket] && buckets[bucket].search(realPath);
+
+    if (!result || !result.handle) {
+      return null;
+    }
 
     if (result) {
       return {
-        value: result,
-        params: {}
+        value: result.handle,
+        params: result.params
       };
-    }
-
-    const split = splitPath(bucket, realPath);
-
-    let branch = dynamic;
-
-    const params: Record<string, string> = {};
-    const paramChunks: string[] = [];
-
-    for (let i = 0; i < split.length; i++) {
-      const chunk = split[i];
-
-      if (chunk === '') {
-        return null;
-      }
-
-      const isLeaf = i == split.length - 1;
-
-      let lookup = branch[chunk];
-
-      if (!lookup || (isLeaf && !lookup.value)) {
-        lookup = branch['*'];
-      }
-
-      if (!lookup) {
-        return null;
-      }
-
-      branch = lookup;
-
-      if (branch.param) {
-        if (allowChangingParameterName) {
-          paramChunks.push(chunk);
-        } else {
-          params[branch.param] = chunk;
-        }
-      }
-
-      if (isLeaf) {
-        if (allowChangingParameterName) {
-          for (const index in paramChunks) {
-            params[branch.params[index]] = paramChunks[index];
-          }
-        }
-
-        return {
-          value: branch.value,
-          params
-        }
-      }
     }
 
     return null;
   };
+
+  let priority = 0;
+  let path;
+  let children;
 
   return {
     addRoute: (bucket: string, path: string, value: V): void => {
@@ -132,23 +103,24 @@ export function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}:
         throw new Error('The first character of a path should be `/` or `*`.');
       }
 
-      const existing = findRoute(bucket, path);
+      let realPath = cleanPath(path);
 
-      if (existing) {
-        const existingParams = Object.keys(existing.params).length;
-        const inputParams = path.match(/:/g);
+      realPath = realPath.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
 
-        // if path exists, it may be a static/dynamic overlap (which is allowed)
-        if (existingParams <= (inputParams ? inputParams.length : 0)) {
-          throw new Error('Route already defined.')
-        }
+      if (!buckets[bucket]) {
+        buckets[bucket] = createNode();
       }
 
-      const realPath = cleanPath(path);
+      buckets[bucket].addRoute(realPath, value);
 
-      if (!nonDynamic[bucket]) {
-        nonDynamic[bucket] = {};
-      }
+      const test = 1;
+
+      /*
+
+
+      let fullPath = path;
+      priority+=1;
+      let numParams = countParams(path);
 
       nonDynamic[bucket][realPath] = value;
 
@@ -198,6 +170,7 @@ export function roadrunner<V>({ignoreTrailingSlash, allowChangingParameterName}:
 
         params = params.slice(0);
       }
+       */
     },
 
     findRoute

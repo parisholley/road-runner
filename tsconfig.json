@@ -5,6 +5,7 @@
     "declaration": true,
     "strict": true,
     "module": "commonjs",
+    "outDir": "dist",
     "baseUrl": "src",
     "target": "es6",
     "lib": [
@@ -12,7 +13,7 @@
     ]
   },
   "include": [
-    "index.ts"
+    "src/*.ts"
   ],
   "exclude": [
     "node_modules"

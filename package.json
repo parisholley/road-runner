@@ -26,9 +26,9 @@
     "typescript": "^3.6.2"
   },
   "license": "MIT",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "source": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index.ts",
   "scripts": {
     "build": "tsc",
     "preversion": "npm run build & npm run test",

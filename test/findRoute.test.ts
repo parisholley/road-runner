@@ -1,4 +1,4 @@
-import {roadrunner} from '../index';
+import {roadrunner} from '../src/index';
 
 const generate = () => ({
   foo: Math.random() * 10000000000
@@ -205,7 +205,7 @@ describe('params', () => {
   });
 
   test('Should allow different param keys along same path', () => {
-    const router = roadrunner({allowChangingParameterName: true});
+    const router = roadrunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2/buh', value);
@@ -473,40 +473,6 @@ describe('mixed', () => {
       params: {param1: 'baz'},
       value
     });
-  });
-});
-
-test('should allow dynamic to overlap static', () => {
-  const router = roadrunner();
-
-  router.addRoute('GET', '/foo', 1);
-  router.addRoute('GET', '/:param', 2);
-
-  expect(router.findRoute('GET', '/foo')).toEqual({
-    params: {},
-    value: 1
-  });
-
-  expect(router.findRoute('GET', '/value')).toEqual({
-    params: {param: 'value'},
-    value: 2
-  });
-});
-
-test('should allow static to overlap dynamic', () => {
-  const router = roadrunner();
-
-  router.addRoute('GET', '/:param', 1);
-  router.addRoute('GET', '/foo', 2);
-
-  expect(router.findRoute('GET', '/foo')).toEqual({
-    params: {},
-    value: 2
-  });
-
-  expect(router.findRoute('GET', '/value')).toEqual({
-    params: {param: 'value'},
-    value: 1
   });
 });
 

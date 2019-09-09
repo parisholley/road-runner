@@ -1,4 +1,13 @@
-import {roadrunner} from '../index';
+import {roadrunner} from '../src/index';
+
+test('Should find root path', () => {
+  const router = roadrunner();
+
+  router.addRoute('GET', '/user', true);
+  router.addRoute('GET', '/user/profile', true);
+  router.addRoute('GET', '/user/avatar', true);
+  router.addRoute('GET', '/user/lookup/username/:username', true);
+});
 
 describe('standard type checking', () => {
   test('Bucket should be a string', () => {
