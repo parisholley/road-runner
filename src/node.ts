@@ -73,6 +73,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
   let type: Type = config.type || Type.STATIC;
   let param: string | undefined = config.param;
   let pathLength = path.length;
+  let childrenLength = children.length;
 
   return {
     hasChildren() {
@@ -191,6 +192,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       }
 
       children = [child];
+      childrenLength = 1;
 
       return child;
     },
@@ -228,7 +230,9 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       if (c !== ":" && c !== "*") {
         const child = createNode<V>({type: Type.STATIC});
 
+        children.push(child);
         childrenI[c.charCodeAt(0)] = child;
+        childrenLength = children.length;
 
         child.insertChild(fullPath, childPath, handle, numParams);
 
@@ -299,6 +303,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
         children = [child];
         childrenI = {[path[i].charCodeAt(0)]: child};
+        childrenLength = 1;
         wildChild = false;
         path = childPath.slice(0, i);
         handle = null;
@@ -378,7 +383,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
           // We need to go deeper!
           if (end < searchPathLength) {
-            if (children.length === 0) {
+            if (childrenLength === 0) {
               return {handle: null, params: {}};
             }
 
