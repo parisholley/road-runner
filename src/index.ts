@@ -31,7 +31,7 @@ function typeCheck(bucket: string, path: string) {
 }
 
 export function roadrunner<V>(): Router<V> {
-  const buckets: Record<string, { dynamic: Node<V>, nondynamic: Record<string, V> }> = {};
+  const buckets: Record<string, Node<V>> = {};
 
   return {
     addRoute: (bucket: string, path: string, value: V): void => {
@@ -46,15 +46,10 @@ export function roadrunner<V>(): Router<V> {
       path = path.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
 
       if (!buckets[bucket]) {
-        buckets[bucket] = {
-          dynamic: createNode(),
-          nondynamic: {}
-        };
+        buckets[bucket] = createNode();
       }
 
-      buckets[bucket].nondynamic[path] = value;
-
-      buckets[bucket].dynamic.addRoute(path, value);
+      buckets[bucket].addRoute(path, value);
     },
 
     findRoute: (bucket: string, path: string): Result<V> | null => {
@@ -64,13 +59,7 @@ export function roadrunner<V>(): Router<V> {
         return null;
       }
 
-      const nondynamic = buckets[bucket].nondynamic[path];
-
-      if (nondynamic) {
-        return {value: nondynamic, params: {}};
-      }
-
-      const dynamic = buckets[bucket].dynamic.search(path);
+      const dynamic = buckets[bucket].search(path);
 
       if (!dynamic.handle) {
         return null;
