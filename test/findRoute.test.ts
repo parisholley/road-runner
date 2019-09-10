@@ -26,18 +26,6 @@ describe('static routes', () => {
     expect(router.findRoute('POST', '/')).toBeNull();
   });
 
-  test('Should find root path (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/', value);
-
-    expect(router.findRoute('GET', '/')).toEqual({
-      params: {},
-      value
-    })
-  });
-
   test('Should not find root path if file is passed', () => {
     const router = roadrunner();
 
@@ -86,18 +74,6 @@ describe('static routes', () => {
     router.addRoute('GET', '/foo/bar', value);
 
     expect(router.findRoute('GET', '/foo/bar/')).toBeNull();
-  });
-
-  test('Should find nested path if extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/bar', value);
-
-    expect(router.findRoute('GET', '/foo/bar/')).toEqual({
-      params: {},
-      value
-    });
   });
 
   test('Should not find nested path if lookup is for nested folder', () => {
@@ -171,18 +147,6 @@ describe('params', () => {
     expect(router.findRoute('GET', '/foo/bar/')).toBeNull();
   });
 
-  test('Should find nested path if lookup has extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/:param1', value);
-
-    expect(router.findRoute('GET', '/foo/bar/')).toEqual({
-      params: {param1: 'bar'},
-      value
-    });
-  });
-
   test('Should not find nested path if lookup is for nested folder', () => {
     const router = roadrunner();
 
@@ -200,24 +164,6 @@ describe('params', () => {
 
     expect(router.findRoute('GET', '/foo/bar/baz/bum')).toEqual({
       params: {param1: 'bar', param2: 'bum'},
-      value
-    });
-  });
-
-  test('Should allow different param keys along same path', () => {
-    const router = roadrunner();
-
-    const value = generate();
-    router.addRoute('GET', '/foo/:param1/baz/:param2/buh', value);
-    router.addRoute('GET', '/foo/:param3/baz/:param4/boy', value);
-
-    expect(router.findRoute('GET', '/foo/bar/baz/bum/buh')).toEqual({
-      params: {param1: 'bar', param2: 'bum'},
-      value
-    });
-
-    expect(router.findRoute('GET', '/foo/bar/baz/bum/boy')).toEqual({
-      params: {param3: 'bar', param4: 'bum'},
       value
     });
   });
@@ -247,18 +193,6 @@ describe('params', () => {
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
 
     expect(router.findRoute('GET', '/foo/bar/baz/bum/')).toBeNull();
-  });
-
-  test('Should find multiple param path if lookup has extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/:param1/baz/:param2', value);
-
-    expect(router.findRoute('GET', '/foo/bar/baz/bum/')).toEqual({
-      params: {param1: 'bar', param2: 'bum'},
-      value
-    });
   });
 
   test('Should not find multiple param path if lookup is for nested folder', () => {
@@ -332,18 +266,6 @@ describe('wildcards', () => {
     expect(router.findRoute('GET', '/foo/bar/')).toBeNull();
   });
 
-  test('Should find nested path if lookup has extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/*', value);
-
-    expect(router.findRoute('GET', '/foo/bar/')).toEqual({
-      params: {},
-      value
-    });
-  });
-
   test('Should not find nested path if lookup is for nested folder', () => {
     const router = roadrunner();
 
@@ -390,18 +312,6 @@ describe('wildcards', () => {
     router.addRoute('GET', '/foo/*/baz/*', value);
 
     expect(router.findRoute('GET', '/foo/bar/baz/bum/')).toBeNull();
-  });
-
-  test('Should find multiple wildcard path if lookup has extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/*/baz/*', value);
-
-    expect(router.findRoute('GET', '/foo/bar/baz/bum/')).toEqual({
-      params: {},
-      value
-    });
   });
 
   test('Should not find multiple wildcard path if lookup is for nested folder', () => {
@@ -462,27 +372,12 @@ describe('mixed', () => {
 
     expect(router.findRoute('GET', '/foo/bar/baz/')).toBeNull();
   });
-
-  test('Should find nested path if lookup has extra slash (ignoreTrailingSlash)', () => {
-    const router = roadrunner({ignoreTrailingSlash: true});
-
-    const value = generate();
-    router.addRoute('GET', '/foo/*/:param1', value);
-
-    expect(router.findRoute('GET', '/foo/bar/baz/')).toEqual({
-      params: {param1: 'baz'},
-      value
-    });
-  });
 });
 
 test('kitchen sink', () => {
   const routes = [
     {path: '/', test: '/'},
-    {path: '/:param1', params: {param1: 'foo'}, test: '/foo'},
-    {path: '/foo/bar', test: '/foo/bar'},
-    {path: '/foo/:param1', params: {param1: 'value'}, test: '/foo/value'},
-    {path: '/foo/:param1/baz/*', params: {param1: 'value'}, test: '/foo/value/baz/bah'}
+    {path: '/foo/:param1', params: {param1: 'value'}, test: '/foo/value'}
   ];
 
   const router = roadrunner();

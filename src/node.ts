@@ -1,5 +1,3 @@
-import {create} from "domain";
-
 enum Type {
   STATIC, ROOT, PARAM, CATCH_ALL
 }
@@ -36,7 +34,7 @@ export interface Node<V> {
 
   search(path: string): Result<V>;
 
-  searchWildcard(searchPath: string): Result<V>;
+  searchWildcard(searchPath: string, searchPathLength: number): Result<V>;
 
   isEmpty(): boolean;
 
@@ -85,6 +83,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
   let wildChild: boolean = config.wildChild || false;
   let type: Type = config.type || Type.STATIC;
   let param: string | undefined = config.param;
+  let pathLength = path.length;
 
   return {
     hasChildren() {
@@ -245,6 +244,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       }
 
       path = newPath;
+      pathLength = newPath.length;
     },
     isEmpty() {
       return !(path.length > 0 || children.length > 0);
@@ -278,7 +278,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
         const child = this.createChild({type: Type.STATIC});
 
-        childrenI[c] = child;
+        childrenI[c.charCodeAt(0)] = child;
 
         child.insertChild(fullPath, childPath, handle, numParams);
 
@@ -362,7 +362,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
         children = [child];
         indices = path[i];
-        childrenI = {[indices]: child};
+        childrenI = {[indices.charCodeAt(0)]: child};
         wildChild = false;
         path = childPath.slice(0, i);
         handle = null;
@@ -383,9 +383,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       } else if (i === childPath.length) {
         // Make node a (in-path leaf)
         if (!split) {
-          throw new Error(
-            "A handle is already registered for path '" + fullPath + "'"
-          );
+          throw new Error('Route already defined.');
         }
 
         handle = fullPathHandle;
@@ -404,15 +402,14 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       }
     },
     search(searchPath: string) {
-      if (searchPath === path) {
-        return {handle, params: {}};
-      }
+      // referring to length is technically a function call, cache it
+      const searchPathLength = searchPath.length;
 
-      if (searchPath.length > path.length && searchPath.slice(0, path.length) === path) {
-        searchPath = searchPath.slice(path.length);
+      if (searchPathLength > pathLength && searchPath.slice(0, pathLength) === path) {
+        searchPath = searchPath.slice(pathLength);
 
         if (wildChild) {
-          return children[0].searchWildcard(searchPath);
+          return children[0].searchWildcard(searchPath, searchPathLength);
         }
 
         // If this node does not have a wildcard child, look up the next child node and continue to walk down the tree
@@ -423,36 +420,30 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
         if (child) {
           return child.search(searchPath);
         }
+      } else if (searchPath === path) {
+        return {handle, params: {}};
       }
 
       return {handle: null, params: {}};
     },
-    searchWildcard(searchPath: string) {
+    searchWildcard(searchPath: string, searchPathLength: number) {
       switch (type) {
         case Type.PARAM:
           // Find param end
           let end = 0;
 
-          while (end < searchPath.length && searchPath.charCodeAt(end) !== 47) {
+          while (end < searchPathLength && searchPath.charCodeAt(end) !== 47) {
             end++;
           }
 
-          const params: Record<string, string> = {};
-
-          const paramKey = param || path.slice(1);
           const paramValue = searchPath.slice(0, end);
 
-          if (!paramValue) {
+          if (!paramValue || !param) {
             return {handle: null, params: {}};
           }
 
-          if (paramKey !== '!') {
-            // Save param value
-            params[paramKey] = paramValue;
-          }
-
           // We need to go deeper!
-          if (end < searchPath.length) {
+          if (end < searchPathLength) {
             if (children.length === 0) {
               return {handle: null, params: {}};
             }
@@ -462,13 +453,20 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
             const deeper = children[0].search(searchPath);
 
             if (!deeper) {
-              return deeper;
+              return {handle: null, params: {}};
             }
 
-            return {
-              handle: deeper.handle,
-              params: {...params, ...deeper.params}
-            };
+            if (param !== '!') {
+              deeper.params[param] = paramValue;
+            }
+
+            return deeper;
+          }
+
+          const params: Record<string, string> = {};
+
+          if (param !== '!') {
+            params[param] = paramValue;
           }
 
           return {handle, params};

@@ -1,9 +1,5 @@
 import {createNode, Node} from "./node";
 
-export interface Options {
-  ignoreTrailingSlash?: boolean;
-}
-
 export interface Router<V> {
   addRoute(bucket: string, path: string, value: V): void;
 
@@ -34,65 +30,8 @@ function typeCheck(bucket: string, path: string) {
   }
 }
 
-function splitPath(bucket: string, path: string) {
-  const split = path.split('/');
-
-  // because string always starts with "/", so stick bucket in first segment
-  split.shift();
-  split[0] = `${split[0]}${bucket}`;
-
-  return split;
-}
-
-function countParams(path: string) {
-  let n = 0;
-  for (let i = 0; i < path.length; i++) {
-    if (path[i] !== ":" && path[i] !== "*") {
-      continue;
-    }
-    n++;
-  }
-
-  return n;
-}
-
-export function roadrunner<V>({ignoreTrailingSlash}: Options = {}): Router<V> {
-  const buckets: Record<string, Node<V>> = {};
-
-  const cleanPath = (path: string) => {
-    let real = path;
-
-    if (ignoreTrailingSlash && real[real.length - 1] === '/') {
-      return real.substring(0, real.length - 1);
-    }
-
-    return real;
-  };
-
-  const findRoute = (bucket: string, path: string): Result<V> | null => {
-    typeCheck(bucket, path);
-
-    const realPath = cleanPath(path);
-
-    let result = buckets[bucket] && buckets[bucket].search(realPath);
-
-    if (!result || !result.handle) {
-      return null;
-    }
-
-    if (result) {
-      return {
-        value: result.handle,
-        params: result.params
-      };
-    }
-
-    return null;
-  };
-
-  let priority = 0;
-  let path;
-  let children;
+export function roadrunner<V>(): Router<V> {
+  const buckets: Record<string, { dynamic: Node<V>, nondynamic: Record<string, V> }> = {};
 
   return {
     addRoute: (bucket: string, path: string, value: V): void => {
@@ -103,76 +42,44 @@ export function roadrunner<V>({ignoreTrailingSlash}: Options = {}): Router<V> {
         throw new Error('The first character of a path should be `/` or `*`.');
       }
 
-      let realPath = cleanPath(path);
-
-      realPath = realPath.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
+      // convert wildcards into params (we suppress them from output later)
+      path = path.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
 
       if (!buckets[bucket]) {
-        buckets[bucket] = createNode();
+        buckets[bucket] = {
+          dynamic: createNode(),
+          nondynamic: {}
+        };
       }
 
-      buckets[bucket].addRoute(realPath, value);
+      buckets[bucket].nondynamic[path] = value;
 
-      const test = 1;
-
-      /*
-
-
-      let fullPath = path;
-      priority+=1;
-      let numParams = countParams(path);
-
-      nonDynamic[bucket][realPath] = value;
-
-      if (!realPath.includes(':') && !realPath.includes('*')) {
-        return;
-      }
-
-      const split = splitPath(bucket, realPath);
-
-      let parent = dynamic;
-
-      let params: string[] = [];
-
-      for (let i = 0; i < split.length; i++) {
-        const isParam = split[i].indexOf(':') === 0;
-        const chunk = isParam ? '*' : split[i];
-
-        if (chunk.includes('*') && chunk !== '*') {
-          throw new Error('Wildcard must be by itself in path.');
-        }
-
-        if (chunk.includes(':') && chunk[0] !== ':') {
-          throw new Error('Param must be by itself in path.');
-        }
-
-        let paramChunk: null | string = null;
-
-        if (isParam) {
-          paramChunk = split[i].substring(1);
-          params.push(paramChunk);
-        }
-
-        if (i === split.length - 1) {
-          parent[chunk] = {value, param: paramChunk, params};
-        } else {
-          const existing = parent[chunk];
-
-          if (existing) {
-            parent = existing;
-          } else {
-            const child = {param: paramChunk};
-            parent[chunk] = child;
-
-            parent = child;
-          }
-        }
-
-        params = params.slice(0);
-      }
-       */
+      buckets[bucket].dynamic.addRoute(path, value);
     },
 
-    findRoute
+    findRoute: (bucket: string, path: string): Result<V> | null => {
+      typeCheck(bucket, path);
+
+      if (!buckets[bucket]) {
+        return null;
+      }
+
+      const nondynamic = buckets[bucket].nondynamic[path];
+
+      if (nondynamic) {
+        return {value: nondynamic, params: {}};
+      }
+
+      const dynamic = buckets[bucket].dynamic.search(path);
+
+      if (!dynamic.handle) {
+        return null;
+      }
+
+      return {
+        value: dynamic.handle,
+        params: dynamic.params
+      };
+    }
   };
 }
