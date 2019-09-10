@@ -3,7 +3,7 @@ enum Type {
 }
 
 export interface Result<V> {
-  handle: V | null;
+  value: V | null;
   params: Record<string, string>
 }
 
@@ -82,7 +82,7 @@ export class Node<V> {
           const paramValue = searchPath.slice(0, end);
 
           if (!paramValue || !n.param) {
-            return {handle: null, params};
+            return {value: null, params};
           }
 
           if (n.param !== '!') {
@@ -92,7 +92,7 @@ export class Node<V> {
           // We need to go deeper!
           if (end < searchPathLength) {
             if (n.childrenLength === 0) {
-              return {handle: null, params};
+              return {value: null, params};
             }
 
             searchPath = searchPath.slice(end);
@@ -102,7 +102,7 @@ export class Node<V> {
             continue walk;
           }
 
-          return {handle: n.handle, params};
+          return {value: n.handle, params};
         }
 
         // If n node does not have a wildcard child, look up the next child node and continue to walk down the tree
@@ -115,10 +115,10 @@ export class Node<V> {
           }
         }
       } else if (searchPath === n.path) {
-        return {handle: n.handle, params};
+        return {value: n.handle, params};
       }
 
-      return {handle: null, params};
+      return {value: null, params};
     }
   }
 

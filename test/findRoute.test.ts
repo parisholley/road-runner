@@ -1,4 +1,4 @@
-import {roadrunner} from '../src/index';
+import {RoadRunner} from '../src/index';
 
 const generate = () => ({
   foo: Math.random() * 10000000000
@@ -6,7 +6,7 @@ const generate = () => ({
 
 describe('static routes', () => {
   test('Should find root path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/', value);
@@ -18,7 +18,7 @@ describe('static routes', () => {
   });
 
   test('Should not find root path if bucket is mismatch', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/', value);
@@ -27,7 +27,7 @@ describe('static routes', () => {
   });
 
   test('Should not find root path if file is passed', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/', value);
@@ -37,7 +37,7 @@ describe('static routes', () => {
 
 
   test('Should not find root path if folder is passed', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/', value);
@@ -47,7 +47,7 @@ describe('static routes', () => {
 
 
   test('Should find nested path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/bar', value);
@@ -59,7 +59,7 @@ describe('static routes', () => {
   });
 
   test('Should not find nested path if partial match', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/bar', value);
@@ -68,7 +68,7 @@ describe('static routes', () => {
   });
 
   test('Should not find nested path if extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/bar', value);
@@ -77,7 +77,7 @@ describe('static routes', () => {
   });
 
   test('Should not find nested path if lookup is for nested folder', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/bar', value);
@@ -88,7 +88,7 @@ describe('static routes', () => {
 
 describe('params', () => {
   test('Should find root path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/:param1', value);
@@ -100,7 +100,7 @@ describe('params', () => {
   });
 
   test('Should not find root path if wildcard is missing', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/:param1', value);
@@ -109,7 +109,7 @@ describe('params', () => {
   });
 
   test('Should find correct subpath', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/bah', generate());
@@ -122,7 +122,7 @@ describe('params', () => {
   });
 
   test('Should not find missing subpath', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/bah', value);
@@ -132,7 +132,7 @@ describe('params', () => {
   });
 
   test('Should enforce trailing slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/', value);
@@ -146,7 +146,7 @@ describe('params', () => {
   });
 
   test('Should find nested path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1', value);
@@ -158,7 +158,7 @@ describe('params', () => {
   });
 
   test('Should not find nested path if param is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1', value);
@@ -167,7 +167,7 @@ describe('params', () => {
   });
 
   test('Should not find nested path if lookup is a folder below', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1', value);
@@ -176,7 +176,7 @@ describe('params', () => {
   });
 
   test('Should not find nested path if lookup has extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1', value);
@@ -185,7 +185,7 @@ describe('params', () => {
   });
 
   test('Should not find nested path if lookup is for nested folder', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1', value);
@@ -194,7 +194,7 @@ describe('params', () => {
   });
 
   test('Should find multiple param path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
@@ -206,7 +206,7 @@ describe('params', () => {
   });
 
   test('Should not find multiple param path if last wildcard is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
@@ -215,7 +215,7 @@ describe('params', () => {
   });
 
   test('Should not find multiple param path if lookup is a folder below', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
@@ -224,7 +224,7 @@ describe('params', () => {
   });
 
   test('Should not find multiple param path if lookup has extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
@@ -233,7 +233,7 @@ describe('params', () => {
   });
 
   test('Should not find multiple param path if lookup is for nested folder', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/:param1/baz/:param2', value);
@@ -244,7 +244,7 @@ describe('params', () => {
 
 describe('wildcards', () => {
   test('Should find root path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/*', value);
@@ -256,7 +256,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find root path if wildcard is missing', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/*', value);
@@ -265,7 +265,7 @@ describe('wildcards', () => {
   });
 
   test('Should find nested path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*', value);
@@ -277,7 +277,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find nested path if wildcard is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*', value);
@@ -286,7 +286,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find nested path if lookup is a folder below', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*', value);
@@ -295,7 +295,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find nested path if lookup has extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*', value);
@@ -304,7 +304,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find nested path if lookup is for nested folder', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*', value);
@@ -313,7 +313,7 @@ describe('wildcards', () => {
   });
 
   test('Should find multiple wildcard path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/baz/*', value);
@@ -325,7 +325,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find multiple wildcard path if last wildcard is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/baz/*', value);
@@ -334,7 +334,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find multiple wildcard path if lookup is a folder below', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/baz/*', value);
@@ -343,7 +343,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find multiple wildcard path if lookup has extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/baz/*', value);
@@ -352,7 +352,7 @@ describe('wildcards', () => {
   });
 
   test('Should not find multiple wildcard path if lookup is for nested folder', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/baz/*', value);
@@ -363,7 +363,7 @@ describe('wildcards', () => {
 
 describe('mixed', () => {
   test('Should find path', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/:param1', value);
@@ -375,7 +375,7 @@ describe('mixed', () => {
   });
 
   test('Should not find path if wildcard is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/:param1', value);
@@ -384,7 +384,7 @@ describe('mixed', () => {
   });
 
   test('Should not find path if param is missing value', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/:param1', value);
@@ -393,7 +393,7 @@ describe('mixed', () => {
   });
 
   test('Should not find path if lookup is a folder below', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/:param1', value);
@@ -402,7 +402,7 @@ describe('mixed', () => {
   });
 
   test('Should not find nested path if lookup has extra slash', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     const value = generate();
     router.addRoute('GET', '/foo/*/:param1', value);
@@ -417,7 +417,7 @@ test('kitchen sink', () => {
     {path: '/foo/:param1', params: {param1: 'value'}, test: '/foo/value'}
   ];
 
-  const router = roadrunner();
+  const router = new RoadRunner();
 
   for (const {path} of routes) {
     router.addRoute('GET', path, path);

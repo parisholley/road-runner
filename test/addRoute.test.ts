@@ -1,8 +1,8 @@
-import {roadrunner} from '../src/index';
+import {RoadRunner} from '../src/index';
 
 describe('standard type checking', () => {
   test('Bucket should be a string', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute(1 as any as string, '/foo', true);
@@ -14,7 +14,7 @@ describe('standard type checking', () => {
   });
 
   test('Path should be a string', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', 1 as any as string, true);
@@ -26,7 +26,7 @@ describe('standard type checking', () => {
   });
 
   test('The path should not be empty', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '', true);
@@ -38,7 +38,7 @@ describe('standard type checking', () => {
   });
 
   test('The bucket should not be empty', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('', '/foo', true);
@@ -50,7 +50,7 @@ describe('standard type checking', () => {
   });
 
   test('The first character of a path should be `/` or `*`', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', 'test', true);
@@ -62,7 +62,7 @@ describe('standard type checking', () => {
   });
 
   test('Root route already defined.', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/foo', true);
@@ -75,7 +75,7 @@ describe('standard type checking', () => {
   });
 
   test('Can add nested param routes.', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/foo/bar', true)
@@ -89,7 +89,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot add a shorter route later.', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/foo', true)
@@ -102,7 +102,7 @@ describe('standard type checking', () => {
   });
 
   test('Should not be able to overlap wildcard with params', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/*', true);
@@ -115,7 +115,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot put multiple params in segment', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/:param1-:param2/foobar', true);
@@ -127,7 +127,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot have blank param name', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/:', true);
@@ -139,7 +139,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot define dynamic after static', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/foo', true);
@@ -152,7 +152,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot define static after dynamic', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/;param1', true);
@@ -165,7 +165,7 @@ describe('standard type checking', () => {
   });
 
   test('Cannot change param names', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/:param1', true);
@@ -178,13 +178,13 @@ describe('standard type checking', () => {
   });
 
   test('Root route not already defined for different bucket.', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
     router.addRoute('GET', '/foo', true);
     router.addRoute('POST', '/foo', true);
   });
 
   test('Nested route already defined.', () => {
-    const router = roadrunner();
+    const router = new RoadRunner();
 
     try {
       router.addRoute('GET', '/foo/bar', true);

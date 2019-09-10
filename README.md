@@ -46,10 +46,17 @@ const router = roadrunner();
 
 router.addRoute('GET', '/path', () => {});
 
-// handler === "() => {}"
-const handler = router.lookupRoute('GET', '/path');
+// handler === {value: "() => {}", params: {}}
+const result = router.lookupRoute('GET', '/path');
 
-handler();
+result.value();
+
+router.addRoute('GET', '/path/:nested', () => {});
+
+// handler === {value: "() => {}", params: {nested: 'foobar'}}
+const result2 = router.lookupRoute('GET', '/path/foobar');
+
+result2.value();
 ```
 
 ## Supported Path Syntax
@@ -88,9 +95,9 @@ const router = roadrunner();
 router.addRoute(`POST:2.1`, '/document/:id', () => {});
 
 function doLookup(headers:Record<string,string>){
-  const handler = router.lookupRoute(`POST:${headers['version']}`, '/document/:id');
+  const result = router.lookupRoute(`POST:${headers['version']}`, '/document/:id');
   
-  handler();
+  result.value();
 }
 ````
 

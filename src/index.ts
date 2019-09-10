@@ -49,7 +49,7 @@ export class RoadRunner<V> {
 
     const dynamic = this.buckets[bucket].search(path);
 
-    if (!dynamic.handle) {
+    if (!dynamic.value) {
       return null;
     }
 
