@@ -1,5 +1,5 @@
 enum Type {
-  STATIC, ROOT, PARAM, CATCH_ALL
+  STATIC, ROOT, PARAM
 }
 
 function countParams(path: string) {
@@ -144,36 +144,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
             n = n.replaceChildren({type: Type.STATIC});
           }
         } else {
-          if (end !== max || numParams > 1) {
-            throw new Error(
-              "catch-all routes are only allowed at the end of the path in path '" +
-              fullPath +
-              "'"
-            );
-          }
-
-          if (path.length > 0 && path[path.length - 1] === "/") {
-            throw new Error(
-              "catch-all conflicts with existing handle for the path segment root in path '" +
-              fullPath +
-              "'"
-            );
-          }
-
-          i--;
-          if (childPath[i] !== "/") {
-            throw new Error("no / before catch-all in path '" + fullPath + "'");
-          }
-
-          this.replacePath(childPath.slice(offset, i));
-
-          // first node: catchAll node with empty path
-          const replaced = this.replaceChildren({type: Type.CATCH_ALL, wildChild: true}, childPath[i]);
-
-          // second node: node holding the variable
-          replaced.replaceChildren({path: childPath.slice(i), type: Type.CATCH_ALL, handle});
-
-          return;
+          throw new Error('unsupported route syntax.');
         }
       }
 
@@ -252,12 +223,8 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       }
 
       // Wildcard conflict
-      let pathSeg = "";
-      if (type === Type.CATCH_ALL) {
-        pathSeg = childPath;
-      } else {
-        pathSeg = childPath.split("/")[0];
-      }
+      const pathSeg = childPath.split("/")[0];
+
       const prefix =
         fullPath.slice(0, fullPath.indexOf(pathSeg)) + path;
       throw new Error(
@@ -366,56 +333,46 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       return {handle: null, params: {}};
     },
     searchWildcard(searchPath: string, searchPathLength: number) {
-      switch (type) {
-        case Type.PARAM:
-          // Find param end
-          let end = 0;
+      let end = 0;
 
-          while (end < searchPathLength && searchPath.charCodeAt(end) !== 47) {
-            end++;
-          }
-
-          const paramValue = searchPath.slice(0, end);
-
-          if (!paramValue || !param) {
-            return {handle: null, params: {}};
-          }
-
-          // We need to go deeper!
-          if (end < searchPathLength) {
-            if (childrenLength === 0) {
-              return {handle: null, params: {}};
-            }
-
-            searchPath = searchPath.slice(end);
-
-            const deeper = children[0].search(searchPath);
-
-            if (!deeper) {
-              return {handle: null, params: {}};
-            }
-
-            if (param !== '!') {
-              deeper.params[param] = paramValue;
-            }
-
-            return deeper;
-          }
-
-          const params: Record<string, string> = {};
-
-          if (param !== '!') {
-            params[param] = paramValue;
-          }
-
-          return {handle, params};
-
-        case Type.CATCH_ALL:
-          return {handle, params: {[path.slice(2)]: searchPath}};
-
-        default:
-          throw new Error("invalid node type");
+      while (end < searchPathLength && searchPath.charCodeAt(end) !== 47) {
+        end++;
       }
+
+      const paramValue = searchPath.slice(0, end);
+
+      if (!paramValue || !param) {
+        return {handle: null, params: {}};
+      }
+
+      // We need to go deeper!
+      if (end < searchPathLength) {
+        if (childrenLength === 0) {
+          return {handle: null, params: {}};
+        }
+
+        searchPath = searchPath.slice(end);
+
+        const deeper = children[0].search(searchPath);
+
+        if (!deeper) {
+          return {handle: null, params: {}};
+        }
+
+        if (param !== '!') {
+          deeper.params[param] = paramValue;
+        }
+
+        return deeper;
+      }
+
+      const params: Record<string, string> = {};
+
+      if (param !== '!') {
+        params[param] = paramValue;
+      }
+
+      return {handle, params};
     }
   }
 }
