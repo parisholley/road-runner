@@ -20,7 +20,6 @@ and partly derived from
 * Case sensitive (use .toLowerCase() when inserting/retrieving if you want case-insensitivity)
 * Limited validation (assuming you are going to pass in valid paths and HTTP methods)
 * No URL parsing, most environments provide some type of req.path functionality
-* Internally leverages closures and a lot of caching
 
 ## Why another router?
 
