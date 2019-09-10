@@ -21,18 +21,6 @@ and partly derived from
 * Limited validation (assuming you are going to pass in valid paths and HTTP methods)
 * No URL parsing, most environments provide some type of req.path functionality
 
-## Why another router?
-
-Node.JS has made [continous improvements](https://v8.dev/blog/fast-properties)
-to the VM for leveraging plain objects as caches/lookup mechanisms.
-Many routers use complex structures to workaround poor performance on
-older versions and often include more functionality than required.
-
-The goals of this very simple router project are:
-
-* Require any new CPU bound functionality be opt-in (using options).
-* Require any new changes not degrade base performance (eg: static routes).
-
 ## Getting Started
 
 The following snippet is the basic setup of the router, remember, it is
