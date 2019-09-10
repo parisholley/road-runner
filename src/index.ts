@@ -1,7 +1,7 @@
 import {Node} from "./node";
 
 interface Result<V> {
-  value: V | null;
+  value: V;
   params: Record<string, string>
 }
 
@@ -54,10 +54,13 @@ export class RoadRunner<V> {
 
     const dynamic = this.buckets[bucket].search(path);
 
-    if (!dynamic.value) {
+    if (dynamic.value === null) {
       return null;
     }
 
-    return dynamic;
+    return {
+      value: dynamic.value,
+      params: dynamic.params
+    };
   }
 }
