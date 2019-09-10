@@ -1,4 +1,4 @@
-import {createNode, Node} from "./node";
+import {Node} from "./node";
 
 export interface Router<V> {
   addRoute(bucket: string, path: string, value: V): void;
@@ -46,7 +46,7 @@ export function roadrunner<V>(): Router<V> {
       path = path.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
 
       if (!buckets[bucket]) {
-        buckets[bucket] = createNode();
+        buckets[bucket] = new Node();
       }
 
       buckets[bucket].addRoute(path, value);
