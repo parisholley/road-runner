@@ -2,7 +2,7 @@ enum Type {
   STATIC, PARAM
 }
 
-export interface Result<V> {
+interface SearchResult<V> {
   value: V | null;
   params: Record<string, string>
 }
@@ -58,7 +58,7 @@ export class Node<V> {
     }
   }
 
-  search(this: Node<V>, searchPath: string): Result<V> {
+  search(this: Node<V>, searchPath: string): SearchResult<V> {
     let n = this;
 
     const params: Record<string, string> = {};

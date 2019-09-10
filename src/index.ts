@@ -1,4 +1,9 @@
-import {Node, Result} from "./node";
+import {Node} from "./node";
+
+interface Result<V> {
+  value: V | null;
+  params: Record<string, string>
+}
 
 function typeCheck(bucket: string, path: string) {
   if (!path) {
