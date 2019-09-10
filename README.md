@@ -7,17 +7,20 @@
 ![size](https://img.shields.io/bundlephobia/min/@parisholley/road-runner)
 ![supported](https://img.shields.io/node/v/@parisholley/road-runner)
 
-
-A router for when latency is Wile E. Coyote :)
+A router for when latency is Wile E. Coyote :) Inspired by
+[julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)
+and partly derived from  
+[steambap/koa-tree-router](https://www.npmjs.com/package/koa-tree-router).
 
 ## Why is it fast?
 
-[See Benchmarks](https://github.com/parisholley/router-benchmark)
+![chart](https://github.com/parisholley/router-benchmark/raw/master/results.png)[chart]
 
 * Params are detected and provided as objects, but no regex or value casting, strings only
 * Case sensitive (use .toLowerCase() when inserting/retrieving if you want case-insensitivity)
 * Limited validation (assuming you are going to pass in valid paths and HTTP methods)
 * No URL parsing, most environments provide some type of req.path functionality
+* Internally leverages closures and a lot of caching
 
 ## Why another router?
 
@@ -48,24 +51,6 @@ router.addRoute('GET', '/path', () => {});
 const handler = router.lookupRoute('GET', '/path');
 
 handler();
-```
-
-## Options
-
-### `ignoreTrailingSlash` (boolean, default = false)
-
-When enabled you can access the same path regardless of a trailing slash
-existing in the lookup path.
-
-```typescript
-import {roadrunner} from "@parisholley/road-runner";
-
-const router = roadrunner();
-
-router.addRoute('GET', '/path', () => {});
-
-router.lookupRoute('GET', '/path');
-router.lookupRoute('GET', '/path/');
 ```
 
 ## Supported Path Syntax
@@ -110,6 +95,7 @@ function doLookup(headers:Record<string,string>){
 }
 ````
 
+[chart]: https://github.com/parisholley/router-benchmark
 [travis]: https://travis-ci.org/parisholley/road-runner
 [npm]: https://www.npmjs.com/package/@parisholley/road-runner
 [coveralls]: https://coveralls.io/github/parisholley/road-runner
