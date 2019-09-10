@@ -14,7 +14,7 @@ and partly derived from
 
 ## Why is it fast?
 
-![chart](https://github.com/parisholley/router-benchmark/raw/master/results.png)[chart]
+[![chart](https://github.com/parisholley/router-benchmark/raw/master/results.png)][chart]
 
 * Params are detected and provided as objects, but no regex or value casting, strings only
 * Case sensitive (use .toLowerCase() when inserting/retrieving if you want case-insensitivity)
