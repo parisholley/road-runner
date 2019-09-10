@@ -5,7 +5,7 @@ enum Type {
 function countParams(path: string) {
   let n = 0;
   for (let i = 0; i < path.length; i++) {
-    if (path[i] !== ":" && path[i] !== "*") {
+    if (path[i] !== ":") {
       continue;
     }
     n++;
@@ -87,14 +87,14 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       // Find prefix until first wildcard
       for (let i = 0, max = childPath.length; numParams > 0; i++) {
         const c = childPath[i];
-        if (c !== ":" && c !== "*") {
+        if (c !== ":") {
           continue;
         }
 
         // Find wildcard end (either '/' or path end)
         let end = i + 1;
         while (end < max && childPath[end] !== "/") {
-          if (childPath[end] === ":" || childPath[end] === "*") {
+          if (childPath[end] === ":") {
             throw new Error(
               "only one wildcard per path segment is allowed, has: '" +
               childPath.slice(i) +
@@ -109,7 +109,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
         // Check if this Node existing children which would be unreachable
         // if we insert the wildcard here
-        if (n.hasChildren() && end !== max) {
+        if (n.hasChildren()) {
           throw new Error(
             "wildcard route '" +
             childPath.slice(i, end) +
@@ -128,23 +128,19 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
           );
         }
 
-        if (c === ":") {
-          // Split path at the beginning of the wildcard
-          if (i > 0) {
-            n.replacePath(childPath.slice(offset, i));
-            offset = i;
-          }
+        // Split path at the beginning of the wildcard
+        if (i > 0) {
+          n.replacePath(childPath.slice(offset, i));
+          offset = i;
+        }
 
-          n = n.replaceChildren({type: Type.PARAM});
-          numParams--;
-          if (end < max) {
-            n.replacePath(childPath.slice(offset, end));
-            offset = end;
+        n = n.replaceChildren({type: Type.PARAM});
+        numParams--;
+        if (end < max) {
+          n.replacePath(childPath.slice(offset, end));
+          offset = end;
 
-            n = n.replaceChildren({type: Type.STATIC});
-          }
-        } else {
-          throw new Error('unsupported route syntax.');
+          n = n.replaceChildren({type: Type.STATIC});
         }
       }
 
@@ -198,7 +194,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       }
 
       // Otherwise insert it
-      if (c !== ":" && c !== "*") {
+      if (c !== ":") {
         const child = createNode<V>({type: Type.STATIC});
 
         children.push(child);
@@ -246,7 +242,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
     },
     commonPrefixIndex(childPath: string) {
       // Find the longest common prefix
-      // This also implies that the common prefix contains no ':' or '*'
+      // This also implies that the common prefix contains no ':'
       // since the existing key can't contain those chars.
       let i = 0;
       const max = Math.min(childPath.length, path.length);
@@ -273,6 +269,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
         childrenLength = 1;
         wildChild = false;
         path = childPath.slice(0, i);
+        pathLength = path.length;
         handle = null;
 
         return true;
@@ -355,7 +352,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
         const deeper = children[0].search(searchPath);
 
-        if (!deeper) {
+        if (!deeper.handle) {
           return {handle: null, params: {}};
         }
 

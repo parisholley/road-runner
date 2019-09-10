@@ -74,12 +74,102 @@ describe('standard type checking', () => {
     }
   });
 
+  test('Can add nested param routes.', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/foo/bar', true)
+      router.addRoute('GET', '/foo/bar/:param', true);
+      router.addRoute('GET', '/foo/bar/:param/baz', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot add a shorter route later.', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/foo', true)
+      router.addRoute('GET', '/fo', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
   test('Should not be able to overlap wildcard with params', () => {
     const router = roadrunner();
 
     try {
       router.addRoute('GET', '/*', true);
       router.addRoute('GET', '/:param1', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot put multiple params in segment', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/:param1-:param2/foobar', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot have blank param name', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/:', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot define dynamic after static', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/foo', true);
+      router.addRoute('GET', '/:param1', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot define static after dynamic', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/;param1', true);
+      router.addRoute('GET', '/foo', true);
+
+      throw new Error('Should have thrown error.');
+    } catch {
+
+    }
+  });
+
+  test('Cannot change param names', () => {
+    const router = roadrunner();
+
+    try {
+      router.addRoute('GET', '/:param1', true);
+      router.addRoute('GET', '/:param2', true);
 
       throw new Error('Should have thrown error.');
     } catch {

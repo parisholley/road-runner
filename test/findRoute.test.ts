@@ -108,6 +108,43 @@ describe('params', () => {
     expect(router.findRoute('GET', '/')).toBeNull();
   });
 
+  test('Should find correct subpath', () => {
+    const router = roadrunner();
+
+    const value = generate();
+    router.addRoute('GET', '/foo/:param1/bah', generate());
+    router.addRoute('GET', '/foo/:param1/baz', value);
+
+    expect(router.findRoute('GET', '/foo/bar/baz')).toEqual({
+      params: {param1: 'bar'},
+      value
+    });
+  });
+
+  test('Should not find missing subpath', () => {
+    const router = roadrunner();
+
+    const value = generate();
+    router.addRoute('GET', '/foo/:param1/bah', value);
+    router.addRoute('GET', '/foo/:param1/baz', generate());
+
+    expect(router.findRoute('GET', '/foo/bar/bum')).toBeNull();
+  });
+
+  test('Should enforce trailing slash', () => {
+    const router = roadrunner();
+
+    const value = generate();
+    router.addRoute('GET', '/foo/:param1/', value);
+
+    expect(router.findRoute('GET', '/foo/baz')).toBeNull();
+
+    expect(router.findRoute('GET', '/foo/baz/')).toEqual({
+      params: {param1: 'baz'},
+      value
+    });
+  });
+
   test('Should find nested path', () => {
     const router = roadrunner();
 
