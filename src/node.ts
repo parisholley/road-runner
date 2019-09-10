@@ -1,5 +1,5 @@
 export enum Type {
-  STATIC, ROOT, PARAM
+  STATIC, PARAM
 }
 
 interface Result<V> {
@@ -17,6 +17,10 @@ interface Options<V> {
   type: Type;
   param: string;
 }
+
+const PARAM = ':';
+const SLASH = '/';
+const SLASH_CODE = SLASH.charCodeAt(0);
 
 export class Node<V> {
   private indices: string;
@@ -51,7 +55,6 @@ export class Node<V> {
       this.onChunk(this, fullPath, fullPath, handle, params);
     } else {
       this.insertChild(fullPath, fullPath, handle, params);
-      this.type = Type.ROOT;
     }
   }
 
@@ -72,7 +75,7 @@ export class Node<V> {
 
           let end = 0;
 
-          while (end < searchPathLength && searchPath.charCodeAt(end) !== 47) {
+          while (end < searchPathLength && searchPath.charCodeAt(end) !== SLASH_CODE) {
             end++;
           }
 
@@ -131,14 +134,14 @@ export class Node<V> {
     // Find prefix until first wildcard
     for (let i = 0, max = childPath.length; numParams > 0; i++) {
       const c = childPath[i];
-      if (c !== ":") {
+      if (c !== PARAM) {
         continue;
       }
 
       // Find wildcard end (either '/' or path end)
       let end = i + 1;
       while (end < max && childPath[end] !== "/") {
-        if (childPath[end] === ":") {
+        if (childPath[end] === PARAM) {
           throw new Error(
             "only one wildcard per path segment is allowed, has: '" +
             childPath.slice(i) +
@@ -184,7 +187,7 @@ export class Node<V> {
         n.replacePath(childPath.slice(offset, end));
         offset = end;
 
-        n = n.replaceChildren({type: Type.STATIC});
+        n = n.replaceChildren();
       }
     }
 
@@ -197,7 +200,7 @@ export class Node<V> {
     this.handle = newHandle;
   }
 
-  private replaceChildren(config: Partial<Options<V>>) {
+  private replaceChildren(config: Partial<Options<V>> = {}) {
     const child = new Node<V>(config);
 
     if (config.type === Type.PARAM) {
@@ -211,7 +214,7 @@ export class Node<V> {
   }
 
   private replacePath(newPath: string) {
-    if (newPath[0] === ':') {
+    if (newPath[0] === PARAM) {
       this.param = newPath.slice(1);
     }
 
@@ -243,7 +246,7 @@ export class Node<V> {
     }
 
     // Otherwise insert it
-    if (c !== ":") {
+    if (c !== PARAM) {
       const child = new Node<V>({type: Type.STATIC});
 
       this.children.push(child);
@@ -295,7 +298,7 @@ export class Node<V> {
 
   private commonPrefixIndex(childPath: string) {
     // Find the longest common prefix
-    // This also implies that the common prefix contains no ':'
+    // This also implies that the common prefix contains no PARAM
     // since the existing key can't contain those chars.
     let i = 0;
     const max = Math.min(childPath.length, this.path.length);
@@ -312,7 +315,6 @@ export class Node<V> {
       const child = new Node<V>({
         path: this.path.slice(i),
         wildChild: this.wildChild,
-        type: Type.STATIC,
         childrenI: this.childrenI,
         children: this.children,
         handle: this.handle,
@@ -355,7 +357,7 @@ export class Node<V> {
   private countParams(path: string) {
     let n = 0;
     for (let i = 0; i < path.length; i++) {
-      if (path[i] !== ":") {
+      if (path[i] !== PARAM) {
         continue;
       }
       n++;
