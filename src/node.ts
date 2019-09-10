@@ -22,13 +22,7 @@ interface Result<V> {
 }
 
 export interface Node<V> {
-  prioritize(): number;
-
   commonPrefixIndex(fullPath: string): number;
-
-  isLowerPriority(pos: number): boolean;
-
-  addPriority(pos: number): number;
 
   addRoute(path: string, handle: V, fullPath?: string, numParams?: number): void;
 
@@ -54,15 +48,12 @@ export interface Node<V> {
 
   replaceChildren(config: Partial<Options<V>>, indices?: string): Node<V>;
 
-  createChild(config: Partial<Options<V>>): Node<V>;
-
   createNode(i: number, fullPath: string, childPath: string, handle: V, numParams: number): void;
 
   insertChild(fullPath: string, childPath: string, handle: V | null, numParams: number): void;
 }
 
 interface Options<V> {
-  priority: number;
   indices: string;
   children: Node<V>[];
   childrenI: Record<string, Node<V>>;
@@ -74,8 +65,6 @@ interface Options<V> {
 }
 
 export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
-  let priority: number = config.priority || 0;
-  let indices: string = config.indices || "";
   let children: Node<V>[] = config.children || [];
   let childrenI: Record<string, Node<V>> = config.childrenI || {};
   let path: string = config.path || "";
@@ -151,7 +140,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
             n.replacePath(childPath.slice(offset, end));
             offset = end;
 
-            n = n.replaceChildren({type: Type.STATIC, priority: 1});
+            n = n.replaceChildren({type: Type.STATIC});
           }
         } else {
           if (end !== max || numParams > 1) {
@@ -181,7 +170,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
           const replaced = this.replaceChildren({type: Type.CATCH_ALL, wildChild: true}, childPath[i]);
 
           // second node: node holding the variable
-          replaced.replaceChildren({path: childPath.slice(i), type: Type.CATCH_ALL, priority: 1, handle});
+          replaced.replaceChildren({path: childPath.slice(i), type: Type.CATCH_ALL, handle});
 
           return;
         }
@@ -191,35 +180,6 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
       n.replacePath(childPath.slice(offset));
       n.setHandle(handle);
     },
-    addPriority(pos: number) {
-      const prio = children[pos].prioritize();
-
-      // Adjust position (move to from)
-      let newPos = pos;
-      while (newPos > 0 && children[newPos - 1].isLowerPriority(prio)) {
-        const temp = children[newPos];
-        children[newPos] = children[newPos - 1];
-        children[newPos - 1] = temp;
-        newPos--;
-      }
-
-      // Build new index char string
-      if (newPos !== pos) {
-        indices =
-          indices.slice(0, newPos) +
-          indices[pos] +
-          indices.slice(newPos, pos) +
-          indices.slice(pos + 1);
-      }
-
-      return newPos;
-    },
-    isLowerPriority(pos: number) {
-      return priority < pos;
-    },
-    prioritize() {
-      return priority += 1;
-    },
     setHandle(newHandle: V) {
       handle = newHandle;
     },
@@ -228,10 +188,6 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
       if (config.type === Type.PARAM) {
         wildChild = true;
-
-        this.prioritize();
-      } else if (config.type === Type.CATCH_ALL && wildChild) {
-        this.prioritize();
       }
 
       children = [child];
@@ -254,29 +210,23 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
       // Slash after param
       if (type === Type.PARAM && c === "/" && children.length === 1) {
-        children[0].prioritize();
-
         this.onChunk(children[0], fullPath, childPath, handle, numParams);
 
         return;
       }
 
       // Check if a child with the next path char exists
-      for (let j = 0; j < indices.length; j++) {
-        if (c === indices[j]) {
-          const priority = this.addPriority(j);
+      const existing = childrenI[c.charCodeAt(0)];
 
-          children[priority].onChunk(children[priority], fullPath, childPath, handle, numParams);
+      if (existing) {
+        existing.onChunk(existing, fullPath, childPath, handle, numParams);
 
-          return;
-        }
+        return;
       }
 
       // Otherwise insert it
       if (c !== ":" && c !== "*") {
-        indices += c;
-
-        const child = this.createChild({type: Type.STATIC});
+        const child = createNode<V>({type: Type.STATIC});
 
         childrenI[c.charCodeAt(0)] = child;
 
@@ -287,18 +237,7 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
 
       this.insertChild(fullPath, childPath, handle, numParams);
     },
-    createChild(config: Partial<Options<V>>) {
-      const child = createNode(config);
-
-      children.push(child);
-
-      this.addPriority(indices.length - 1);
-
-      return child;
-    },
     processWildcard(fullPath: string, childPath: string, handle: V, numParams: number) {
-      this.prioritize();
-
       const isMatch = childPath.length >= path.length &&
         path === childPath.slice(0, path.length) &&
         (path.length >= childPath.length || childPath[path.length] === "/");
@@ -353,16 +292,13 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
           path: path.slice(i),
           wildChild,
           type: Type.STATIC,
-          indices,
           childrenI,
           children,
-          handle,
-          priority: priority - 1
+          handle
         });
 
         children = [child];
-        indices = path[i];
-        childrenI = {[indices.charCodeAt(0)]: child};
+        childrenI = {[path[i].charCodeAt(0)]: child};
         wildChild = false;
         path = childPath.slice(0, i);
         handle = null;
@@ -391,8 +327,6 @@ export function createNode<V>(config: Partial<Options<V>> = {}): Node<V> {
     },
     addRoute(fullPath: string, handle: V) {
       const params = countParams(fullPath);
-
-      this.prioritize();
 
       if (!this.isEmpty()) {
         this.onChunk(this, fullPath, fullPath, handle, params);
