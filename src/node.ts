@@ -1,8 +1,8 @@
-export enum Type {
+enum Type {
   STATIC, PARAM
 }
 
-interface Result<V> {
+export interface Result<V> {
   handle: V | null;
   params: Record<string, string>
 }

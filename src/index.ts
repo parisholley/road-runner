@@ -1,15 +1,4 @@
-import {Node} from "./node";
-
-export interface Router<V> {
-  addRoute(bucket: string, path: string, value: V): void;
-
-  findRoute(bucket: string, path: string): Result<V> | null;
-}
-
-export interface Result<V> {
-  value: V;
-  params: Record<string, string>;
-}
+import {Node, Result} from "./node";
 
 function typeCheck(bucket: string, path: string) {
   if (!path) {
@@ -30,45 +19,40 @@ function typeCheck(bucket: string, path: string) {
   }
 }
 
-export function roadrunner<V>(): Router<V> {
-  const buckets: Record<string, Node<V>> = {};
+export class RoadRunner<V> {
+  private buckets: Record<string, Node<V>> = {};
 
-  return {
-    addRoute: (bucket: string, path: string, value: V): void => {
-      typeCheck(bucket, path);
+  addRoute(bucket: string, path: string, value: V): void {
+    typeCheck(bucket, path);
 
-      // only check when building routes for performance, assume user will pass in correct values on lookup
-      if (path[0] !== '/' && path[0] !== '*') {
-        throw new Error('The first character of a path should be `/` or `*`.');
-      }
-
-      // convert wildcards into params (we suppress them from output later)
-      path = path.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
-
-      if (!buckets[bucket]) {
-        buckets[bucket] = new Node();
-      }
-
-      buckets[bucket].addRoute(path, value);
-    },
-
-    findRoute: (bucket: string, path: string): Result<V> | null => {
-      typeCheck(bucket, path);
-
-      if (!buckets[bucket]) {
-        return null;
-      }
-
-      const dynamic = buckets[bucket].search(path);
-
-      if (!dynamic.handle) {
-        return null;
-      }
-
-      return {
-        value: dynamic.handle,
-        params: dynamic.params
-      };
+    // only check when building routes for performance, assume user will pass in correct values on lookup
+    if (path[0] !== '/' && path[0] !== '*') {
+      throw new Error('The first character of a path should be `/` or `*`.');
     }
-  };
+
+    // convert wildcards into params (we suppress them from output later)
+    path = path.replace(/\*([A-z0-9]+)?\//g, ':!/').replace(/\*$/g, ':!');
+
+    if (!this.buckets[bucket]) {
+      this.buckets[bucket] = new Node();
+    }
+
+    this.buckets[bucket].addRoute(path, value);
+  }
+
+  findRoute(bucket: string, path: string): Result<V> | null {
+    typeCheck(bucket, path);
+
+    if (!this.buckets[bucket]) {
+      return null;
+    }
+
+    const dynamic = this.buckets[bucket].search(path);
+
+    if (!dynamic.handle) {
+      return null;
+    }
+
+    return dynamic;
+  }
 }
