@@ -17,7 +17,7 @@
   "description": "The fastest path resolver for URL routing on modern Node.JS",
   "devDependencies": {
     "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.4",
+    "@types/node": "^12.12.21",
     "benchmark": "^2.1.4",
     "coveralls": "^3.0.6",
     "jest": "^24.9.0",
